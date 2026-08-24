@@ -3,7 +3,7 @@
 P6AI —— 面向 Primavera P6 Professional（独立版 SQLite）的 AI 计划建库工具。
 """
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 from .plan import DEMO_PLAN, compute_estimates, validate_plan_data
 from .schema import check_database

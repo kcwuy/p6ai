@@ -5,24 +5,8 @@ import sqlite3
 import tempfile
 import unittest
 
+from helpers import build_minimal_db
 from p6ai.schema import check_database, is_sqlite_file
-
-
-def build_minimal_db(path, with_epmm_marker=False):
-    """按 REQUIRED_TABLES 构造一个最小兼容库（用于测试自检）。"""
-    from p6ai.schema import REQUIRED_TABLES
-
-    conn = sqlite3.connect(path)
-    cur = conn.cursor()
-    for table, cols in REQUIRED_TABLES.items():
-        col_defs = ", ".join(f"{c} TEXT" for c in cols)
-        cur.execute(f"CREATE TABLE {table} ({col_defs})")
-    cur.execute("CREATE TABLE PREFER (DATABASE_VERSION TEXT, MIN_PRO_VERSION TEXT)")
-    cur.execute("INSERT INTO PREFER VALUES ('PPMDB,2312.0000.0000.0005', '23.10.00')")
-    if with_epmm_marker:
-        cur.execute("ALTER TABLE PROJECT ADD COLUMN STATUS_CODE TEXT")
-    conn.commit()
-    conn.close()
 
 
 class TestSchemaCheck(unittest.TestCase):

@@ -29,6 +29,9 @@ def build_parser() -> argparse.ArgumentParser:
     p_create.add_argument("--db", "-d", default=DEFAULT_DB, help="P6 数据库文件路径")
     p_create.add_argument("--no-backup", action="store_true", help="写入前不自动备份（不推荐）")
 
+    p_serve = sub.add_parser("serve", help="启动 MCP 服务器（stdio，供 AI 客户端调用）")
+    p_serve.add_argument("--db", "-d", default=DEFAULT_DB, help="默认 P6 数据库文件路径")
+
     return parser
 
 
@@ -55,6 +58,13 @@ def cmd_create(args) -> int:
     return 0 if result["status"] == "success" else 1
 
 
+def cmd_serve(args) -> int:
+    from .mcp_server import StdioMcpServer
+
+    StdioMcpServer(default_db=args.db).serve()
+    return 0
+
+
 def main(argv=None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
@@ -64,6 +74,8 @@ def main(argv=None) -> int:
         return cmd_validate(args)
     if args.command == "create":
         return cmd_create(args)
+    if args.command == "serve":
+        return cmd_serve(args)
     parser.print_help()
     return 1
 

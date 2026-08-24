@@ -37,6 +37,39 @@ def get_max(cur, table: str, col: str) -> int:
     return int(cur.fetchone()[0])
 
 
+def list_projects(db_path: str = DEFAULT_DB) -> dict:
+    """只读列出 P6 数据库中的项目（ID、代码、计划起止、工序/WBS 数量）。"""
+    if not os.path.exists(db_path):
+        return {"status": "error", "message": f"未找到数据库文件: {db_path}", "projects": []}
+    try:
+        conn = sqlite3.connect(db_path, timeout=3)
+        cur = conn.cursor()
+        rows = cur.execute(
+            """
+            SELECT p.PROJ_ID, p.PROJ_SHORT_NAME, p.PLAN_START_DATE, p.PLAN_END_DATE,
+                   (SELECT COUNT(*) FROM TASK t WHERE t.PROJ_ID = p.PROJ_ID) AS task_cnt,
+                   (SELECT COUNT(*) FROM PROJWBS w WHERE w.PROJ_ID = p.PROJ_ID) AS wbs_cnt
+            FROM PROJECT p
+            ORDER BY p.PROJ_ID
+            """
+        ).fetchall()
+        conn.close()
+        projects = [
+            {
+                "proj_id": r[0],
+                "proj_short_name": r[1],
+                "plan_start_date": r[2],
+                "plan_end_date": r[3],
+                "task_count": r[4],
+                "wbs_count": r[5],
+            }
+            for r in rows
+        ]
+        return {"status": "success", "projects": projects}
+    except sqlite3.Error as e:
+        return {"status": "error", "message": f"读取数据库失败: {e}", "projects": []}
+
+
 def resolve_calendar(cur, plan_data):
     """按名称精确匹配 -> 关键词模糊匹配 -> 默认日历 -> 首个日历。"""
     target = plan_data.get("calendar_name")

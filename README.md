@@ -65,6 +65,52 @@ python -m p6ai create --plan plan.json --db "C:\Users\<you>\Documents\PPMDBSQLit
 - 每次写入前自动生成 `PPMDBSQLite.db.bak_时间戳` 备份
 - 写入基于逆向验证的表结构，不同 P6 版本请先运行 `check`
 
+## MCP 接口（AI 工具）
+
+p6ai 内置一个**零依赖**的 MCP 服务器（stdio 传输，仅使用 Python 标准库），
+任何支持 MCP 的 AI 客户端（Claude Desktop、Codex、Cursor 等）都可以直接调用：
+
+| 工具 | 说明 |
+|---|---|
+| `validate_plan` | 校验计划 JSON（字段、WBS 引用、工期、关系类型、循环依赖） |
+| `create_project` | 校验并写入 P6 数据库（自动备份、单事务、失败回滚） |
+| `list_projects` | 只读列出数据库中的项目 |
+| `check_database` | 数据库结构自检与版本识别 |
+
+启动服务器：
+
+```bash
+python -m p6ai serve
+# 安装后也可直接：p6ai serve
+```
+
+Claude Desktop 配置示例（`claude_desktop_config.json`）：
+
+```json
+{
+  "mcpServers": {
+    "p6ai": {
+      "command": "python",
+      "args": ["-m", "p6ai", "serve"],
+      "cwd": "C:\\path\\to\\p6ai"
+    }
+  }
+}
+```
+
+Codex CLI 配置示例（`~/.codex/config.toml`）：
+
+```toml
+[mcp_servers.p6ai]
+command = "python"
+args = ["-m", "p6ai", "serve"]
+cwd = "C:\\path\\to\\p6ai"
+```
+
+> 如果 `python` 不在系统 PATH 中，请把 `command` 换成 Python 解释器的完整路径。
+> AI 客户端可以直接用自然语言驱动这些工具，例如："校验这份计划"、"把这个施工方案
+> 建到 P6 里"。
+
 ## Supported Environments
 
 - Primavera P6 Professional 23.12（独立版 SQLite，`PPMDB,2312.*`）
@@ -72,7 +118,7 @@ python -m p6ai create --plan plan.json --db "C:\Users\<you>\Documents\PPMDBSQLit
 
 ## Roadmap
 
-- [ ] MCP 服务器：向 AI 客户端（Claude / Codex / Cursor）暴露校验、建库、列表、自检工具
+- [x] MCP 服务器：向 AI 客户端（Claude / Codex / Cursor）暴露校验、建库、列表、自检工具
 - [ ] XER 导出与 DCMA 质检集成
 - [ ] 多版本 schema 适配层
 

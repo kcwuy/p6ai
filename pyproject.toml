@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "p6ai"
-version = "0.1.0"
+version = "0.2.0"
 description = "AI 驱动的 Primavera P6 Professional（独立版 SQLite）计划建库工具"
 readme = "README.md"
 requires-python = ">=3.9"
