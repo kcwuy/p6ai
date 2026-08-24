@@ -2,6 +2,8 @@
 
 AI 驱动的 **Primavera P6 Professional（独立版 SQLite）计划建库工具**。
 
+> 👥 不熟悉程序的土木行业朋友，请看：[给土木行业朋友的说明](docs/非技术指南.md)
+
 P6AI 接收结构化的施工计划 JSON，先做完整性 / 业务 / 网络（DAG）校验，
 再以单事务直接写入 P6 Professional 独立版的 `PPMDBSQLite.db`，自动备份、
 自动回滚、自动对齐主键序列。写入后打开 P6 按 **F9** 即可完成进度计算。
